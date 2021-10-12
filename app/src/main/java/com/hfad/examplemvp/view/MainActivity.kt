@@ -30,10 +30,8 @@ class MainActivity : AppCompatActivity(), IMainPresentor {
                 R.id.btn_counter3 -> Numb.THEE
                 else -> throw IllegalStateException("error btn")
             }
-
             presentor.counterClick(type)
         }
-
         initBtn(listener)
     }
 
@@ -43,15 +41,6 @@ class MainActivity : AppCompatActivity(), IMainPresentor {
         binding.btnCounter3.setOnClickListener(listener)
     }
 
-
-    private fun setOnClickBtn() {
-        Log.i("QQQQ", "жмак")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 
     override fun setButtonTextOne(text: String) {
         binding.btnCounter1.text = text
@@ -65,5 +54,9 @@ class MainActivity : AppCompatActivity(), IMainPresentor {
         binding.btnCounter3.text = text
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 
 }
