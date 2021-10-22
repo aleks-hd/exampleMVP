@@ -1,62 +1,50 @@
 package com.hfad.examplemvp.view
 
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
+import com.github.terrakok.cicerone.androidx.AppNavigator
+import com.hfad.examplemvp.App
 import com.hfad.examplemvp.R
 import com.hfad.examplemvp.databinding.ActivityMainBinding
-import com.hfad.examplemvp.model.Numb
-import com.hfad.examplemvp.presentor.Presentor
-import java.lang.IllegalStateException
+import com.hfad.examplemvp.presentor.MainPresenter
+import moxy.MvpAppCompatActivity
+import moxy.ktx.moxyPresenter
 
-class MainActivity : AppCompatActivity(), IMainPresentor {
+class MainActivity : MvpAppCompatActivity(), MainView {
 
-    private var _binding: ActivityMainBinding? = null
-    private val binding get() = _binding!!
+    val navigator = AppNavigator(this, R.id.container)
 
-    val presentor = Presentor(this)
+    private val presenter by moxyPresenter {
+        MainPresenter(App.instance.router, AndroidScreens()) }
+
+    private var vb: ActivityMainBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        vb = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(vb?.root)
+    }
 
-        val listener = View.OnClickListener {
-            val type = when (it.id) {
-                R.id.btn_counter1 -> Numb.ONE
-                R.id.btn_counter2 -> Numb.TWO
-                R.id.btn_counter3 -> Numb.THEE
-                else -> throw IllegalStateException("error btn")
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        App.instance.navigatorHolder.setNavigator(navigator)
+    }
+
+
+
+    /*override fun onBackPressed() {
+        super.onBackPressed()
+        supportFragmentManager.fragments.forEach {
+            if (it is BackButtonListener && it.backPressed()) {
+                return
             }
-            presentor.counterClick(type)
         }
-        initBtn(listener)
+        presenter.backClicked()
+    }*/
+
+
+    override fun onPause() {
+        super.onPause()
+        App.instance.navigatorHolder.removeNavigator()
     }
-
-    private fun initBtn(listener: View.OnClickListener) {
-        binding.btnCounter1.setOnClickListener(listener)
-        binding.btnCounter2.setOnClickListener(listener)
-        binding.btnCounter3.setOnClickListener(listener)
-    }
-
-
-    override fun setButtonTextOne(text: String) {
-        binding.btnCounter1.text = text
-    }
-
-    override fun setButtonTextTwo(text: String) {
-        binding.btnCounter2.text = text
-    }
-
-    override fun setButtonTextTree(text: String) {
-        binding.btnCounter3.text = text
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
 }
